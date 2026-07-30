@@ -7,7 +7,7 @@ export async function registerService(requestPayload) {
     console.log("Received Register Data")
     console.log(requestPayload)
 
-    const response = await api.post("http://localhost:8080/auth/register", requestPayload)
+    const response = await api.post("/auth/register", requestPayload)
     console.log(response.data)
 
 
@@ -16,7 +16,7 @@ export async function registerService(requestPayload) {
 export async function loginService(requestPayload) {
     console.log("Request Received ")
     console.log(requestPayload)
-    const response = await api.post("http://localhost:8080/auth/login", requestPayload, {
+    const response = await api.post("/auth/login", requestPayload, {
         withCredentials : true
     })
     console.log(response.data)
@@ -25,7 +25,7 @@ export async function loginService(requestPayload) {
 }
 
 export async function setRole(userId, role) {
-    await api.post("http://localhost:8080/auth/role/setup", {
+    await api.post("/auth/role/setup", {
         role : role , jwtToken : userId
     })
 
@@ -71,10 +71,10 @@ export function getRole() {
 
 
 export function redirectGoogle () {
-    window.location.href = "http://localhost:8080/login/oauth2/code/google"
+    window.location.href = "https://interview-coach-server.up.railway.app/oauth2/authorization/google"
 }
 
 export async function logout() {
-    await api.get("http://localhost:8080/auth/logout", {withCredentials : true})
+    await api.get("/auth/logout", {withCredentials : true})
     console.log("Logout Successful") ; 
 }

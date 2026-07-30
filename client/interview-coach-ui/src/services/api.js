@@ -62,7 +62,7 @@ api.interceptors.response.use(
             try {
 
                 const refreshResponse = await axios.post(
-                    "http://localhost:8080/auth/refresh",
+                    import.meta.env.VITE_API_URL+"/auth/refresh",
                     {},
                     {
                         withCredentials: true
