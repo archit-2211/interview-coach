@@ -60,7 +60,7 @@ public class OAuth2SuccessHandler
         ResponseCookie refreshCookie = ResponseCookie.from("refreshToken", refreshToken).path("/").httpOnly(true).secure(false).maxAge(60*60*24*30).sameSite("Lax").build() ; 
         
         response.addHeader(HttpHeaders.SET_COOKIE, refreshCookie.toString());
-        response.sendRedirect("http://localhost:5173/auth/success#token="+bearerToken);
+        response.sendRedirect("interview-coach-ux.netlify.app/auth/success#token="+bearerToken);
 
         }
         
