@@ -1,6 +1,8 @@
 package com.interviewcoach.project.security;
 
 import java.io.IOException;
+
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.security.core.Authentication;
@@ -21,10 +23,12 @@ import jakarta.servlet.http.HttpServletResponse;
 @Component
 public class OAuth2SuccessHandler
         implements AuthenticationSuccessHandler {
-
+    @Value("${CLIENT_DOMAIN}")
+    private String clientDomain ; 
     private AuthService authService;
     private JwtService jwtService;
     private RefreshTokenService rtservice;
+    
 
     public OAuth2SuccessHandler(AuthService authService, JwtService jwtService, RefreshTokenService rtservice) {
         this.authService = authService;
@@ -50,7 +54,7 @@ public class OAuth2SuccessHandler
        
 
         if(savedUser.getUserRole().equals(UserRole.PENDING)) {
-             response.sendRedirect("http://localhost:5173/role/me/"+bearerToken);  
+             response.sendRedirect(clientDomain+"/role/me/"+bearerToken);  
 
         }
         else {
@@ -60,7 +64,7 @@ public class OAuth2SuccessHandler
         ResponseCookie refreshCookie = ResponseCookie.from("refreshToken", refreshToken).path("/").httpOnly(true).secure(false).maxAge(60*60*24*30).sameSite("Lax").build() ; 
         
         response.addHeader(HttpHeaders.SET_COOKIE, refreshCookie.toString());
-        response.sendRedirect("interview-coach-ux.netlify.app/auth/success#token="+bearerToken);
+        response.sendRedirect(clientDomain+"/auth/success#token="+bearerToken);
 
         }
         
