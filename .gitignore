@@ -1,0 +1,19 @@
+# VS Code
+.vscode/
+
+# macOS
+.DS_Store
+
+# Environment
+.env
+.env.*
+
+# Maven
+server/project/target/
+
+# React
+UI/interview-coach-ui/node_modules/
+UI/interview-coach-ui/dist/
+
+# Logs
+*.log
