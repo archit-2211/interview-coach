@@ -46,7 +46,7 @@ public class AuthController {
         System.out.println("Got the rerquest \n \n \n");
         LoggedinDTO response = authService.login(myDto);
         ResponseCookie myCookie = ResponseCookie.from("refreshToken", response.refreshToken()).httpOnly(true)
-                .maxAge(50 * 60 * 24 * 30).sameSite("Lax").secure(false).path("/").build();
+                .maxAge(50 * 60 * 24 * 30).sameSite("Lax").secure(true).path("/").build();
         responseHttp.addHeader(HttpHeaders.SET_COOKIE, myCookie.toString());
 
         return new ResponseEntity<>(new LoggedinResponse(response.bearerToken()), HttpStatus.OK);
@@ -79,7 +79,7 @@ public class AuthController {
                 .httpOnly(true)
                 .maxAge(0)
                 .sameSite("Lax")
-                .secure(false)
+                .secure(true)
                 .path("/")
                 .build();
 
