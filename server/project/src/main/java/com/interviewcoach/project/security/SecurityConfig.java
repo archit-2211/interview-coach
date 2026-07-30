@@ -2,6 +2,8 @@ package com.interviewcoach.project.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -30,6 +32,7 @@ public class SecurityConfig {
                         throws Exception {
 
                 return http
+                                .cors(Customizer.withDefaults())
 
                                 .csrf(csrf -> csrf.disable())
 
@@ -37,11 +40,9 @@ public class SecurityConfig {
                                                 SessionCreationPolicy.STATELESS))
 
                                 .authorizeHttpRequests(auth -> auth
+                                           .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                                                 .requestMatchers(
-                                                                "/auth/**",
-                                                                "/swagger-ui/**",
-                                                                "/v3/api-docs/**",
-                                                                "/swagger-ui.html")
+                                                                "/auth/**")
                                                 .permitAll()
                                                 .anyRequest()
                                                 .authenticated())

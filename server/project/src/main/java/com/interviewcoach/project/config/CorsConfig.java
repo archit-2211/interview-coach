@@ -18,7 +18,7 @@ public CorsConfigurationSource corsConfigurationSource() {
             new CorsConfiguration();
 
     config.setAllowedOrigins(
-            List.of("http://localhost:5173", "interview-coach-ux.netlify.app")
+            List.of("http://localhost:5173", "https://interview-coach-ux.netlify.app")
     );
 
     config.setAllowedMethods(
