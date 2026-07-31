@@ -2,6 +2,15 @@
 
 **Live Demo:** [https://interview-coach-ux.netlify.app](https://interview-coach-ux.netlify.app)
 
+
+### Demo Credentials
+
+| Role | Email | Password |
+|------|-------|----------|
+| Candidate | candidate@example.com | Demo@123 |
+| Interviewer | interviewer@example.com | Demo@123 |
+
+
 ## Overview
 
 Interview Coach is a full-stack mock-interview scheduling platform. It connects candidates with interviewers by matching interviewer profiles to requested skills, exposing interviewer availability, and managing the interview lifecycle from request to feedback.
