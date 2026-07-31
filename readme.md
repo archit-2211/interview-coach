@@ -10,6 +10,8 @@
 | Candidate | candidate@example.com | Demo@123 |
 | Interviewer | interviewer@example.com | Demo@123 |
 
+> **Note:** You may also register using your own email address. However, newly registered accounts are unverified by default and have limited access to application features until approved by an administrator. To explore all functionality immediately, please use one of the demo accounts above.
+
 
 ## Overview
 
