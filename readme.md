@@ -2,6 +2,51 @@
 
 **Live Demo:** [https://interview-coach-ux.netlify.app](https://interview-coach-ux.netlify.app)
 
+## Table of Contents
+
+- [Demo Credentials](#demo-credentials)
+- [Overview](#overview)
+- [Features](#features)
+  - [Backend](#backend)
+  - [Frontend](#frontend)
+  - [Security](#security)
+  - [Candidate Capabilities](#candidate-capabilities)
+  - [Interviewer Capabilities](#interviewer-capabilities)
+  - [Admin Capabilities](#admin-capabilities)
+- [Tech Stack](#tech-stack)
+- [System Architecture](#system-architecture)
+  - [Overall Architecture](#overall-architecture)
+  - [Request Flow](#request-flow)
+  - [Authentication Flow](#authentication-flow)
+  - [Component Interactions](#component-interactions)
+- [Database Schema](#database-schema)
+  - [Entity Reference](#entity-reference)
+  - [Embedded Value Objects](#embedded-value-objects)
+  - [Relationships, Cascades, and Constraints](#relationships-cascades-and-constraints)
+- [Project Structure](#project-structure)
+- [Getting Started](#getting-started)
+  - [Prerequisites](#prerequisites)
+  - [Installation](#installation)
+  - [Environment Variables](#environment-variables)
+  - [Running Locally](#running-locally)
+  - [Running with Docker](#running-with-docker)
+- [API Overview](#api-overview)
+  - [Authentication](#authentication)
+  - [Candidate](#candidate)
+  - [Interviewer](#interviewer)
+  - [Admin](#admin)
+  - [Profile](#profile)
+  - [Interview](#interview)
+  - [Skills](#skills)
+  - [Slots](#slots)
+  - [Resumes](#resumes)
+  - [Health Check](#health-check)
+- [Security](#security-1)
+- [Design Decisions](#design-decisions)
+- [Screenshots](#screenshots)
+- [Future Improvements](#future-improvements)
+- [License](#license)
+
 
 ### Demo Credentials
 
@@ -33,6 +78,7 @@ Key capabilities include role-aware authentication, Google OAuth 2.0 sign-in, sk
 - Supports completion and cancellation flows; a completed interview can receive feedback from both participants.
 - Accepts PDF resume uploads and currently records a temporary `/uploads/<filename>` URL rather than uploading to an external object store.
 - Exposes OpenAPI metadata through Springdoc.
+- Exposes Spring Boot Actuator health, metrics, and Prometheus endpoints. HTTP server request histograms are enabled for latency monitoring.
 
 ### Frontend
 
@@ -83,7 +129,8 @@ Key capabilities include role-aware authentication, Google OAuth 2.0 sign-in, sk
 | API documentation | Springdoc OpenAPI UI dependency and a bearer-auth security scheme |
 | Build tools | Maven Wrapper for the server; npm and Vite for the client |
 | Deployment references | Netlify frontend origin and a Railway backend OAuth URL are referenced in source; no deployment manifest is committed |
-| DevOps | No Dockerfile, Docker Compose file, CI workflow, or infrastructure-as-code configuration is present |
+| DevOps | Multi-stage Docker build for the server and a Docker Compose stack for MySQL, the API, Prometheus, and Grafana |
+| Observability | Spring Boot Actuator, Micrometer Prometheus registry, Prometheus (15-second scrape interval), Grafana, and request ID log correlation |
 | Caching | No cache provider or Spring caching configuration is implemented |
 
 ## System Architecture
@@ -102,6 +149,8 @@ flowchart LR
     Controllers --> Services[Domain services]
     Services --> Repositories[Spring Data JPA repositories]
     Repositories --> DB[(MySQL)]
+    API -->|/actuator/prometheus| Prometheus
+    Prometheus --> Grafana[Grafana dashboards]
     API -->|HttpOnly refresh-token cookie| Browser
 ```
 
@@ -285,6 +334,10 @@ erDiagram
 │       │   └── GlobalExceptionHandler.java
 │       ├── src/main/resources/
 │       │   └── application.properties # Environment-driven server configuration
+│       ├── monitoring/
+│       │   └── prometheus.yml         # Prometheus scrape configuration
+│       ├── Dockerfile                  # Multi-stage Java 21 server image
+│       ├── compose.yml                 # MySQL, API, Prometheus, and Grafana stack
 │       ├── pom.xml                 # Maven dependencies and Java version
 │       └── mvnw                    # Maven Wrapper
 └── README.md
@@ -298,6 +351,7 @@ erDiagram
 - Node.js and npm
 - A running MySQL instance
 - A Google OAuth client if Google sign-in is required
+- Docker Engine with Docker Compose v2 (for the containerized server and monitoring stack)
 
 ### Installation
 
@@ -315,7 +369,7 @@ cd ../../server/project
 
 ### Environment Variables
 
-Create `server/project/.env` (or provide these variables through your shell or deployment platform). Spring Boot reads the following values from `application.properties` and the OAuth success handler:
+Create `server/project/.env` (or provide these variables through your shell or deployment platform). Spring Boot reads the following values from `application.properties` and the OAuth success handler. When using Docker Compose, set `DB_URL` to `jdbc:mysql://mysql:3306/interview_coach` so the API connects to the MySQL service over the Compose network.
 
 | Variable | Required | Description |
 | --- | --- | --- |
@@ -367,7 +421,38 @@ npm run build
 
 ### Running with Docker
 
-Docker support is not currently included: the repository has no `Dockerfile` or Docker Compose configuration. Run the server, client, and MySQL locally or add container definitions as a future improvement.
+The container stack runs MySQL 8.4, the Spring Boot API, Prometheus, and Grafana. The React client is not containerized; run it separately with `npm run dev` when developing locally.
+
+From `server/project`, create `.env` with the variables above, build the server image, and start the stack:
+
+```bash
+cd server/project
+docker build -t interview-coach:latest .
+docker volume create grafana-data
+docker compose --env-file .env up -d
+```
+
+Available local services:
+
+| Service | URL | Notes |
+| --- | --- | --- |
+| Interview Coach API | `http://localhost:8080` | Spring Boot server |
+| Actuator health | `http://localhost:8080/actuator/health` | Public health endpoint |
+| Prometheus metrics | `http://localhost:8080/actuator/prometheus` | Metrics scraped by Prometheus |
+| Prometheus | `http://localhost:9090` | Scrapes the API every 15 seconds |
+| Grafana | `http://localhost:3000` | Sign in with Grafana's default `admin` / `admin` credentials, then change the password when prompted |
+| MySQL | `localhost:3306` | Uses the `DB_PASSWORD` value from `.env` |
+
+Grafana has no pre-provisioned data source or dashboards. Add Prometheus manually with the server URL `http://prometheus:9090`, then build panels from metrics such as `http_server_requests_seconds_count` and `http_server_requests_seconds_bucket`.
+
+To stop the stack while retaining MySQL and Grafana data, run:
+
+```bash
+cd server/project
+docker compose --env-file .env down
+```
+
+The Compose file publishes the database and monitoring interfaces on the host. Treat this setup as a local or trusted-network environment; use access controls and secret management before deploying it publicly.
 
 ## API Overview
 
@@ -501,7 +586,7 @@ Add screenshots to `docs/screenshots/` and replace the placeholders below when v
 - Add database constraints for relationship optionality/uniqueness where intended, and enforce one accepted interview per request/slot at the database level.
 - Add pagination controls to the interviewer-search UI, which currently calls the backend without page parameters.
 - Add automated unit, integration, and end-to-end tests beyond the generated Spring Boot context-load test.
-- Add Docker, Compose, CI, environment templates, and deployment configuration for repeatable delivery.
+- Add CI, environment templates, and production deployment configuration for repeatable delivery.
 - Add a feedback retrieval endpoint; a service stub exists but its controller mapping is commented out and the method returns `null`.
 - Avoid placing an access token in the OAuth redirect URL fragment if a different secure exchange design is preferred.
 
