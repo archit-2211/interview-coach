@@ -2,6 +2,7 @@ package com.interviewcoach.project.InterviewManagement;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -33,6 +34,8 @@ import com.interviewcoach.project.models.Profile;
 import com.interviewcoach.project.models.Skill;
 import com.interviewcoach.project.models.Slot;
 
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.Timer;
 import jakarta.transaction.Transactional;
 
 @Service
@@ -42,23 +45,31 @@ public class InterviewManagementService {
         private ProfileManagementService pmService;
         private SlotService slotService;
         private InterviewRequestRepository interviewRequestRepository;
+        private final MeterRegistry meterRegistry ; 
+        private final Timer interviewSearchTimer ; 
+
 
         public InterviewManagementService(ProfileManagementService pmService, SlotService slotService,
                         InterviewRequestRepository interviewRequestRepository,
-                        InterviewRepository interviewRepository) {
+                        InterviewRepository interviewRepository, MeterRegistry meterRegistry) {
                 this.pmService = pmService;
                 this.slotService = slotService;
                 this.interviewRequestRepository = interviewRequestRepository;
                 this.interviewRepository = interviewRepository;
+                this.meterRegistry = meterRegistry ; 
+                this.interviewSearchTimer = Timer.builder("interviewers.search.duration").description("Time taken by search for interviewers").register(meterRegistry);
+            
+
 
         }
 
         @PreAuthorize("hasRole('CANDIDATE')")
         public List<InterviewerResponseDTO> getInterviewers(List<String> skills, int pageNumber, int pageSize) {
 
-                List<ProfileResponseDTO> interviewers = pmService.getInterviewers(skills, pageNumber, pageSize);
+                List<ProfileResponseDTO> interviewers = interviewSearchTimer.record(() -> pmService.getInterviewers(skills, pageNumber, pageSize));
 
                 return interviewers.stream().map(ele -> mapToDto(ele)).toList();
+                
         }
 
         @PreAuthorize("hasRole('CANDIDATE')")
@@ -129,6 +140,9 @@ public class InterviewManagementService {
 
                 interviewRequestRepository
                                 .save(request);
+                
+                meterRegistry.counter("interview.requests.created").increment(1) ; 
+              
 
         }
 
