@@ -543,7 +543,7 @@ There is no standalone skills controller. Skills are created or reused through `
 
 | Method | Endpoint | Summary |
 | --- | --- | --- |
-| `GET` | `/api/hello` | Returns a simple backend-live message. |
+| `GET` | `/api/test/**` | Returns a simple backend-live message. |
 
 ## Security
 
