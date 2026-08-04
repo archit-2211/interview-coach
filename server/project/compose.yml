@@ -34,8 +34,11 @@ services:
 
     depends_on:
       - interview-coach
-  
   interview-coach:
+    build:
+      context: .
+      dockerfile: Dockerfile
+
     image: interview-coach:latest
     container_name: interview-coach-server
 
@@ -67,8 +70,38 @@ services:
     depends_on:
       - prometheus
 
+  loki:
+    image: grafana/loki:latest
+    container_name: interview-coach-loki
+
+    ports:
+      - "3100:3100"
+
+    volumes:
+      - loki-data:/loki
+
+    command: -config.file=/etc/loki/local-config.yaml
+
+  alloy:
+    image: grafana/alloy:latest
+    container_name: interview-coach-alloy
+
+    volumes:
+      - ./monitoring/config.alloy:/etc/alloy/config.alloy:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+
+    command:
+      - run
+      - /etc/alloy/config.alloy
+
+    depends_on:
+      - loki
+
 volumes:
   mysql-data:
-  grafana-data:
 
+  grafana-data:
     external: true
+  
+  loki-data:
+  
