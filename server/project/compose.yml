@@ -85,6 +85,9 @@ services:
   alloy:
     image: grafana/alloy:latest
     container_name: interview-coach-alloy
+    ports:
+    - "4317:4317"   # OTLP gRPC
+    - "4318:4318" #otlp http
 
     volumes:
       - ./monitoring/config.alloy:/etc/alloy/config.alloy:ro
@@ -93,9 +96,23 @@ services:
     command:
       - run
       - /etc/alloy/config.alloy
+    
 
     depends_on:
       - loki
+
+  tempo:
+    image: grafana/tempo:latest
+    container_name: tempo
+    command: ["-config.file=/etc/tempo.yml"]
+
+    volumes:
+      - ./observability/tempo/tempo.yml:/etc/tempo.yml
+
+    ports:
+      - "3200:3200"
+
+    
 
 volumes:
   mysql-data:
