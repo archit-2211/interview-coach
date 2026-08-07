@@ -114,7 +114,7 @@ public class AuthService {
                             AuthenticationSource.GOOGLE)
                     .userRole(UserRole.PENDING)
                     .build();
-
+            pmService.createProfile(user) ; 
             user = userRepository.save(user);
         }
 
