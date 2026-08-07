@@ -78,10 +78,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
                 User user = userRepository.findByEmail(email).orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
-                if (user.getUserStatus() != UserStatus.VERIFIED) {
-                        throw new UnverifiedException(
-                                        "Please verify your account first");
-                }
+                // if (user.getUserStatus() != UserStatus.VERIFIED) {
+                //         throw new UnverifiedException(
+                //                         "Please verify your account first");
+                // }
 
                 List<GrantedAuthority> authorities = List.of(
                                 new SimpleGrantedAuthority(
