@@ -2,26 +2,16 @@ package com.interviewcoach.project.InterviewManagement;
 
 import java.util.List;
 import java.util.UUID;
-import java.util.concurrent.atomic.AtomicInteger;
-
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-
-import com.interviewcoach.project.InterviewManagement.dtos.FeedbackDTO;
 import com.interviewcoach.project.InterviewManagement.dtos.FeedbackResponseDTO;
 import com.interviewcoach.project.InterviewManagement.dtos.IRDetailsDTO;
 import com.interviewcoach.project.InterviewManagement.dtos.InterviewDTO;
 import com.interviewcoach.project.InterviewManagement.dtos.InterviewRequestDTO;
 import com.interviewcoach.project.InterviewManagement.dtos.InterviewerResponseDTO;
-
 import com.interviewcoach.project.ProfileManagement.ProfileManagementService;
-
 import com.interviewcoach.project.ProfileManagement.DTO.ProfileResponseDTO;
-
 import com.interviewcoach.project.SlotManagement.SlotService;
-
 import com.interviewcoach.project.enums.InterviewRequestStatus;
 import com.interviewcoach.project.enums.InterviewStatus;
 import com.interviewcoach.project.enums.SlotStatus;
@@ -33,6 +23,7 @@ import com.interviewcoach.project.models.InterviewersFeedback;
 import com.interviewcoach.project.models.Profile;
 import com.interviewcoach.project.models.Skill;
 import com.interviewcoach.project.models.Slot;
+import com.interviewcoach.project.security.JwtService;
 
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Timer;
@@ -47,17 +38,19 @@ public class InterviewManagementService {
         private InterviewRequestRepository interviewRequestRepository;
         private final MeterRegistry meterRegistry ; 
         private final Timer interviewSearchTimer ; 
+        private JwtService jwtService ; 
 
 
         public InterviewManagementService(ProfileManagementService pmService, SlotService slotService,
                         InterviewRequestRepository interviewRequestRepository,
-                        InterviewRepository interviewRepository, MeterRegistry meterRegistry) {
+                        InterviewRepository interviewRepository, MeterRegistry meterRegistry, JwtService jwtService) {
                 this.pmService = pmService;
                 this.slotService = slotService;
                 this.interviewRequestRepository = interviewRequestRepository;
                 this.interviewRepository = interviewRepository;
                 this.meterRegistry = meterRegistry ; 
                 this.interviewSearchTimer = Timer.builder("interviewers.search.duration").description("Time taken by search for interviewers").register(meterRegistry);
+                this.jwtService = jwtService ; 
             
 
 
@@ -149,7 +142,7 @@ public class InterviewManagementService {
         public List<InterviewRequestDTO> getAllInterviewRequests(String email) {
                 List<InterviewRequest> allRequests;
 
-                if (isInterviewer()) {
+                if (jwtService.isInterviewer()) {
                         allRequests = interviewRequestRepository
                                         .findByInterviewerProfileUserEmailOrderByCreatedAtDesc(email);
 
@@ -166,7 +159,7 @@ public class InterviewManagementService {
 
                 List<InterviewRequest> allRequests;
 
-                if (isInterviewer()) {
+                if (jwtService.isInterviewer()) {
                         allRequests = interviewRequestRepository
                                         .findByInterviewerProfileUserEmailAndInterviewRequestStatusOrderByCreatedAtDesc(
                                                         email, InterviewRequestStatus.PENDING);
@@ -268,7 +261,7 @@ public class InterviewManagementService {
 
                 List<Interview> interviews;
 
-                if (isInterviewer()) {
+                if (jwtService.isInterviewer()) {
 
                         interviews = interviewRepository
                                         .findByInterviewRequestInterviewerProfileUserEmail(
@@ -413,17 +406,4 @@ public class InterviewManagementService {
 
       
 
-        protected boolean isInterviewer() {
-                Authentication auth = SecurityContextHolder
-                                .getContext()
-                                .getAuthentication();
-
-                boolean isInterviewer = auth.getAuthorities()
-                                .stream()
-                                .anyMatch(
-                                                authority -> authority.getAuthority()
-                                                                .equals("ROLE_INTERVIEWER"));
-                return isInterviewer;
-
-        }
 }

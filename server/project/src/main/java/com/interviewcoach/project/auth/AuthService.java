@@ -51,22 +51,22 @@ public class AuthService {
     }
 
     @Transactional
-    public RegisteredDTO register(RegisterDTO dto) throws RuntimeException {
-        System.out.println("Request received at service to create User") ; 
-        User user = dtoToModel(dto);
-        Optional<User> myUser = userRepository.findByEmail(user.getEmail());
+    public RegisteredDTO register(RegisterDTO dto) {
+
+    
+        Optional<User> myUser = userRepository.findByEmail(dto.email());
 
      
         if (myUser.isPresent()) {
             throw new UserExistsException("User already exists please login");
 
         }
-        System.out.println("User doesnt exist in db verified here ") ; 
-
+    
+        User user = dtoToModel(dto); 
         user = userRepository.save(user);
-        System.out.println("User creation successful in db") ; 
+    
         pmService.createProfile(user);
-        System.out.println("Profile creation successful and returning the dto");
+
         return getDto(user);
 
     }

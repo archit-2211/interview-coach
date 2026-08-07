@@ -205,18 +205,18 @@ public class GlobalExceptionHandler {
                                                                 LocalDateTime.now()));
         }
 
-        @ExceptionHandler(RuntimeException.class)
-        public ResponseEntity<ApiError> handleRuntimeException(
-                        RuntimeException ex) {
+        // @ExceptionHandler(RuntimeException.class)
+        // public ResponseEntity<ApiError> handleRuntimeException(
+        //                 RuntimeException ex) {
 
-                return ResponseEntity
-                                .status(HttpStatus.BAD_REQUEST)
-                                .body(
-                                                new ApiError(
-                                                                ex.getMessage(),
-                                                                HttpStatus.BAD_REQUEST.value(),
-                                                                LocalDateTime.now()));
-        }
+        //         return ResponseEntity
+        //                         .status(HttpStatus.BAD_REQUEST)
+        //                         .body(
+        //                                         new ApiError(
+        //                                                         ex.getMessage(),
+        //                                                         HttpStatus.BAD_REQUEST.value(),
+        //                                                         LocalDateTime.now()));
+        // }
 
        
 

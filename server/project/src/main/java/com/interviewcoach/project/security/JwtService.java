@@ -6,7 +6,10 @@ import java.util.HashMap;
 
 import javax.crypto.SecretKey;
 
+
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import com.interviewcoach.project.models.User;
@@ -60,6 +63,20 @@ public class JwtService {
             return false ; 
         }
     }
+    public boolean isInterviewer() {
+              Authentication auth = SecurityContextHolder
+                                .getContext()
+                                .getAuthentication();
+
+                boolean isInterviewer = auth.getAuthorities()
+                                .stream()
+                                .anyMatch(
+                                                authority -> authority.getAuthority()
+                                                                .equals("ROLE_INTERVIEWER"));
+                return isInterviewer;
+
+        }
+    
 
         private SecretKey getSignInKey() {
 

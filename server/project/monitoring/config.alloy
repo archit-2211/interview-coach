@@ -37,6 +37,10 @@ loki.process "logs" {
       route  = "",
     }
   }
+  stage.drop {
+        source     = "route"
+        expression = "^/actuator/prometheus$"
+    }
 
   forward_to = [loki.write.default.receiver]
 }
@@ -61,15 +65,54 @@ otelcol.receiver.otlp "spring" {
   }
 
   output {
+    traces = [otelcol.processor.tail_sampling.traces.input]
+  }
+}
+
+
+otelcol.processor.tail_sampling "traces" {
+
+  decision_wait = "5s"
+
+  policy {
+    name = "errors"
+    type = "status_code"
+
+    status_code {
+      status_codes = ["ERROR"]
+    }
+  }
+
+  policy {
+    name = "slow-traces"
+    type = "latency"
+
+    latency {
+      threshold_ms = 1000
+    }
+  }
+
+  policy {
+    name = "normal-traces"
+    type = "probabilistic"
+
+    probabilistic {
+      sampling_percentage = 10
+    }
+  }
+
+  output {
     traces = [otelcol.processor.batch.traces.input]
   }
 }
+
 
 otelcol.processor.batch "traces" {
   output {
     traces = [otelcol.exporter.otlp.tempo.input]
   }
 }
+
 
 otelcol.exporter.otlp "tempo" {
   client {
