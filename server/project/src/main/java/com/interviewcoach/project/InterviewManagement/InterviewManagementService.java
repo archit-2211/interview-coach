@@ -26,7 +26,7 @@ import com.interviewcoach.project.models.Slot;
 import com.interviewcoach.project.security.JwtService;
 
 import io.micrometer.core.instrument.MeterRegistry;
-import io.micrometer.core.instrument.Timer;
+
 import jakarta.transaction.Transactional;
 
 @Service
@@ -36,8 +36,6 @@ public class InterviewManagementService {
         private ProfileManagementService pmService;
         private SlotService slotService;
         private InterviewRequestRepository interviewRequestRepository;
-        private final MeterRegistry meterRegistry ; 
-        private final Timer interviewSearchTimer ; 
         private JwtService jwtService ; 
 
 
@@ -48,8 +46,7 @@ public class InterviewManagementService {
                 this.slotService = slotService;
                 this.interviewRequestRepository = interviewRequestRepository;
                 this.interviewRepository = interviewRepository;
-                this.meterRegistry = meterRegistry ; 
-                this.interviewSearchTimer = Timer.builder("interviewers.search.duration").description("Time taken by search for interviewers").register(meterRegistry);
+        
                 this.jwtService = jwtService ; 
             
 
@@ -59,7 +56,7 @@ public class InterviewManagementService {
         @PreAuthorize("hasRole('CANDIDATE')")
         public List<InterviewerResponseDTO> getInterviewers(List<String> skills, int pageNumber, int pageSize) {
 
-                List<ProfileResponseDTO> interviewers = interviewSearchTimer.record(() -> pmService.getInterviewers(skills, pageNumber, pageSize));
+                List<ProfileResponseDTO> interviewers = pmService.getInterviewers(skills, pageNumber, pageSize);
 
                 return interviewers.stream().map(ele -> mapToDto(ele)).toList();
                 
@@ -76,7 +73,6 @@ public class InterviewManagementService {
                 Slot slot = slotService.getSlotById(dto.slotId());
 
                 Profile interviewerProfile = slot.getProfile();
-                System.out.println(interviewerProfile.getUser().getEmail() + dto.interviewerEmail());
                 if (!interviewerProfile.getUser().getEmail().equals(dto.interviewerEmail())) {
                         throw new RuntimeException("INVALID DETAILS PROVIDED.");
                 }
@@ -134,7 +130,6 @@ public class InterviewManagementService {
                 interviewRequestRepository
                                 .save(request);
                 
-                meterRegistry.counter("interview.requests.created").increment(1) ; 
               
 
         }
