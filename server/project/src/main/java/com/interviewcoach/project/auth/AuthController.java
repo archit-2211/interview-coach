@@ -11,6 +11,7 @@ import com.interviewcoach.project.auth.dto.RegisteredDTO;
 import com.interviewcoach.project.auth.dto.RoleSetupDTO;
 
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -33,7 +34,7 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<RegisteredDTO> register(@RequestBody RegisterDTO mydto) {
+    public ResponseEntity<RegisteredDTO> register(@RequestBody @Valid RegisterDTO mydto) {
         RegisteredDTO response = authService.register(mydto);
 
         return new ResponseEntity<RegisteredDTO>(response, HttpStatus.OK);
@@ -42,8 +43,6 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<LoggedinResponse> login(@RequestBody LoginDTO myDto, HttpServletResponse responseHttp) {
-
-        System.out.println("Got the rerquest \n \n \n");
         LoggedinDTO response = authService.login(myDto);
         ResponseCookie myCookie = ResponseCookie.from("refreshToken", response.refreshToken()).httpOnly(true)
                 .maxAge(50 * 60 * 24 * 30).sameSite("Lax").secure(true).path("/").build();

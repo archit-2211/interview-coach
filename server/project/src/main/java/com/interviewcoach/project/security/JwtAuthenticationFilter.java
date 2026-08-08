@@ -7,14 +7,10 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
+
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import com.interviewcoach.project.auth.UserRepository;
-import com.interviewcoach.project.auth.exceptions.UnverifiedException;
-import com.interviewcoach.project.enums.UserStatus;
-import com.interviewcoach.project.models.User;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -25,11 +21,14 @@ import jakarta.servlet.http.HttpServletResponse;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         private final JwtService jwtService;
-        private final UserRepository userRepository;
+       
+        // private final AuthService authService;
 
-        public JwtAuthenticationFilter(JwtService jwtService, UserRepository userRepository) {
+        public JwtAuthenticationFilter(JwtService jwtService
+                // AuthService authService
+        ) {
                 this.jwtService = jwtService;
-                this.userRepository = userRepository;
+        //        this.authService = authService;
         }
 
         @Override
@@ -76,7 +75,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
                 String role = jwtService.getRole(jwt);
 
-                User user = userRepository.findByEmail(email).orElseThrow(() -> new UsernameNotFoundException("User not found"));
+                // User user = authService.findByEmail(email).orElseThrow() ; 
 
                 // if (user.getUserStatus() != UserStatus.VERIFIED) {
                 //         throw new UnverifiedException(

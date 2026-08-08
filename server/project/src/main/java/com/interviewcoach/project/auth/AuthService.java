@@ -50,11 +50,16 @@ public class AuthService {
    
     }
 
+    public Optional<User> findByEmail(String email) {
+        return userRepository.findByEmail(email);
+
+    }
+
     @Transactional
     public RegisteredDTO register(RegisterDTO dto) {
 
     
-        Optional<User> myUser = userRepository.findByEmail(dto.email());
+        Optional<User> myUser = findByEmail(dto.email());
 
      
         if (myUser.isPresent()) {
