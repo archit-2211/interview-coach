@@ -68,14 +68,6 @@ public class ProfileManagementController {
                         userEmail));
     }
 
-
-    // @DeleteMapping("/me/skills")
-    // public ResponseEntity<ProfileResponseDTO> removeSkill(@RequestBody ProfileSkillsReq skillNames) {
-    //     String email = getEmail(); 
-    //     return ResponseEntity.ok(profileService.removeSkillFromProfile(skillNames.skills(), email)) ; 
-
-    // }
-
     @GetMapping("/me/work-experiences")
     public ResponseEntity<WorkexResponseDTO> getExperiences() {
         String email = getEmail() ; 

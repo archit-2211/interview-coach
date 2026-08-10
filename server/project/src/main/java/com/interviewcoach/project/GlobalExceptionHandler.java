@@ -1,6 +1,5 @@
 package com.interviewcoach.project;
 
-
 import java.time.LocalDateTime;
 
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -21,231 +20,190 @@ import com.interviewcoach.project.SlotManagement.exceptions.SlotUnavailableExcep
 import com.interviewcoach.project.auth.dto.ApiError;
 import com.interviewcoach.project.auth.exceptions.IncorrectCredentialsException;
 import com.interviewcoach.project.auth.exceptions.InvalidRefreshTokenException;
-import com.interviewcoach.project.auth.exceptions.UserExistsException;
 import com.interviewcoach.project.auth.exceptions.OAuthException;
 import com.interviewcoach.project.auth.exceptions.UnverifiedException;
+import com.interviewcoach.project.auth.exceptions.UserExistsException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-        @ExceptionHandler(IncorrectCredentialsException.class)
-        public ResponseEntity<ApiError> handleIncorrectCredentials(
-                        IncorrectCredentialsException ex) {
+    @ExceptionHandler(IncorrectCredentialsException.class)
+    public ResponseEntity<ApiError> handleIncorrectCredentials(
+            IncorrectCredentialsException ex) {
 
-                return ResponseEntity
-                                .status(HttpStatus.UNAUTHORIZED)
-                                .body(
-                                                new ApiError(
-                                                                ex.getMessage(),
-                                                                HttpStatus.UNAUTHORIZED.value(),
-                                                                LocalDateTime.now()));
-        }
+        return ResponseEntity
+                .status(HttpStatus.UNAUTHORIZED)
+                .body(new ApiError(
+                        ex.getMessage(),
+                        HttpStatus.UNAUTHORIZED.value(),
+                        LocalDateTime.now()));
+    }
 
-        @ExceptionHandler(InvalidRefreshTokenException.class)
-        public ResponseEntity<ApiError> handleInvalidRefreshToken(
-                        InvalidRefreshTokenException ex) {
+    @ExceptionHandler(InvalidRefreshTokenException.class)
+    public ResponseEntity<ApiError> handleInvalidRefreshToken(
+            InvalidRefreshTokenException ex) {
 
-                return ResponseEntity
-                                .status(HttpStatus.UNAUTHORIZED)
-                                .body(
-                                                new ApiError(
-                                                                ex.getMessage(),
-                                                                HttpStatus.UNAUTHORIZED.value(),
-                                                                LocalDateTime.now()));
-        }
+        return ResponseEntity
+                .status(HttpStatus.UNAUTHORIZED)
+                .body(new ApiError(
+                        ex.getMessage(),
+                        HttpStatus.UNAUTHORIZED.value(),
+                        LocalDateTime.now()));
+    }
 
-        @ExceptionHandler(OAuthException.class)
-        public ResponseEntity<ApiError> handleOAuthException(
-                        OAuthException ex) {
+    @ExceptionHandler(OAuthException.class)
+    public ResponseEntity<ApiError> handleOAuthException(
+            OAuthException ex) {
 
-                return ResponseEntity
-                                .status(HttpStatus.UNAUTHORIZED)
-                                .body(
-                                                new ApiError(
-                                                                ex.getMessage(),
-                                                                HttpStatus.UNAUTHORIZED.value(),
-                                                                LocalDateTime.now()));
-        }
+        return ResponseEntity
+                .status(HttpStatus.UNAUTHORIZED)
+                .body(new ApiError(
+                        ex.getMessage(),
+                        HttpStatus.UNAUTHORIZED.value(),
+                        LocalDateTime.now()));
+    }
 
-        @ExceptionHandler(UserExistsException.class)
-        public ResponseEntity<ApiError> handleUserExists(
-                        UserExistsException ex) {
+    @ExceptionHandler(UserExistsException.class)
+    public ResponseEntity<ApiError> handleUserExists(
+            UserExistsException ex) {
 
-                return ResponseEntity
-                                .status(HttpStatus.CONFLICT)
-                                .body(
-                                                new ApiError(
-                                                                ex.getMessage(),
-                                                                HttpStatus.CONFLICT.value(),
-                                                                LocalDateTime.now()));
-        }
-        @ExceptionHandler(UnverifiedException.class)
-        public ResponseEntity<ApiError> handleUnverifiedException(
-                        UnverifiedException ex) {
+        return ResponseEntity
+                .status(HttpStatus.CONFLICT)
+                .body(new ApiError(
+                        ex.getMessage(),
+                        HttpStatus.CONFLICT.value(),
+                        LocalDateTime.now()));
+    }
 
-                return ResponseEntity
-                                .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                                .body(
-                                                new ApiError(
-                                                                "User is not yet verified please verify first",
-                                                                HttpStatus.CONFLICT.value(),
-                                                                LocalDateTime.now()));
-        }
-        @ExceptionHandler(UserNotFoundException.class)
-        public ResponseEntity<ApiError> handleUserNotFound(
-                        UserNotFoundException ex) {
+    @ExceptionHandler(UnverifiedException.class)
+    public ResponseEntity<ApiError> handleUnverifiedException(
+            UnverifiedException ex) {
 
-                return ResponseEntity
-                                .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                                .body(
-                                                new ApiError(
-                                                                ex.getMessage(),
-                                                                HttpStatus.BAD_REQUEST.value(),
-                                                                LocalDateTime.now()));
-        }
+        return ResponseEntity
+                .status(HttpStatus.CONFLICT)
+                .body(new ApiError(
+                        "User is not yet verified please verify first",
+                        HttpStatus.CONFLICT.value(),
+                        LocalDateTime.now()));
+    }
 
-        @ExceptionHandler(InvalidExperienceException.class)
-        public ResponseEntity<ApiError> handleInvalidExperience(
-                        InvalidExperienceException ex) {
+    @ExceptionHandler(UserNotFoundException.class)
+    public ResponseEntity<ApiError> handleUserNotFound(
+            UserNotFoundException ex) {
 
-                return ResponseEntity
-                                .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                                .body(
-                                                new ApiError(
-                                                                ex.getMessage(),
-                                                                HttpStatus.BAD_REQUEST.value(),
-                                                                LocalDateTime.now()));
-        }
-        @ExceptionHandler(UnauthorisedException.class)
-        public ResponseEntity<ApiError> handleUnauthorisedResumeRequest(
-                        UnauthorisedException ex) {
+        return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body(new ApiError(
+                        ex.getMessage(),
+                        HttpStatus.NOT_FOUND.value(),
+                        LocalDateTime.now()));
+    }
 
-                return ResponseEntity
-                                .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                                .body(
-                                                new ApiError(
-                                                                ex.getMessage(),
-                                                                HttpStatus.BAD_REQUEST.value(),
-                                                                LocalDateTime.now()));
-        }
-        
+    @ExceptionHandler(InvalidExperienceException.class)
+    public ResponseEntity<ApiError> handleInvalidExperience(
+            InvalidExperienceException ex) {
 
-        @ExceptionHandler(ProfileNotFoundException.class)
-        public ResponseEntity<ApiError> handleUProfileNotFound(
-                        ProfileNotFoundException ex) {
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(new ApiError(
+                        ex.getMessage(),
+                        HttpStatus.BAD_REQUEST.value(),
+                        LocalDateTime.now()));
+    }
 
-                return ResponseEntity
-                                .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                                .body(
-                                                new ApiError(
-                                                                ex.getMessage(),
-                                                                HttpStatus.BAD_REQUEST.value(),
-                                                                LocalDateTime.now()));
-        }
-        @ExceptionHandler(InvalidFileTypeException.class)
-        public ResponseEntity<ApiError> handleInvalidFileType(
-                        InvalidFileTypeException ex) {
+    @ExceptionHandler(UnauthorisedException.class)
+    public ResponseEntity<ApiError> handleUnauthorisedResumeRequest(
+            UnauthorisedException ex) {
 
-                return ResponseEntity
-                                .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                                .body(
-                                                new ApiError(
-                                                                ex.getMessage(),
-                                                                HttpStatus.CONFLICT.value(),
-                                                                LocalDateTime.now()));
-        }
-         @ExceptionHandler(EmptyFileException.class)
-        public ResponseEntity<ApiError> handleEmptyFile(
-                        EmptyFileException ex) {
+        return ResponseEntity
+                .status(HttpStatus.UNAUTHORIZED)
+                .body(new ApiError(
+                        ex.getMessage(),
+                        HttpStatus.UNAUTHORIZED.value(),
+                        LocalDateTime.now()));
+    }
 
-                return ResponseEntity
-                                .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                                .body(
-                                                new ApiError(
-                                                                ex.getMessage(),
-                                                                HttpStatus.CONFLICT.value(),
-                                                                LocalDateTime.now()));
-        }
+    @ExceptionHandler(ProfileNotFoundException.class)
+    public ResponseEntity<ApiError> handleProfileNotFound(
+            ProfileNotFoundException ex) {
 
-         @ExceptionHandler(SlotNotFoundException.class)
-        public ResponseEntity<ApiError> handleInvalidSlot(
-                        SlotNotFoundException ex) {
+        return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body(new ApiError(
+                        ex.getMessage(),
+                        HttpStatus.NOT_FOUND.value(),
+                        LocalDateTime.now()));
+    }
 
-                return ResponseEntity
-                                .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                                .body(
-                                                new ApiError(
-                                                                ex.getMessage(),
-                                                                HttpStatus.BAD_REQUEST.value(),
-                                                                LocalDateTime.now()));
-        }
-         @ExceptionHandler(SlotUnavailableException.class)
-        public ResponseEntity<ApiError> handleInvalidSlot(
-                        SlotUnavailableException ex) {
+    @ExceptionHandler(InvalidFileTypeException.class)
+    public ResponseEntity<ApiError> handleInvalidFileType(
+            InvalidFileTypeException ex) {
 
-                return ResponseEntity
-                                .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                                .body(
-                                                new ApiError(
-                                                                ex.getMessage(),
-                                                                HttpStatus.CONFLICT.value(),
-                                                                LocalDateTime.now()));
-        }
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(new ApiError(
+                        ex.getMessage(),
+                        HttpStatus.BAD_REQUEST.value(),
+                        LocalDateTime.now()));
+    }
 
-         @ExceptionHandler(InvalidSlotException.class)
-        public ResponseEntity<ApiError> handleInvalidSlot(
-                        InvalidSlotException ex) {
+    @ExceptionHandler(EmptyFileException.class)
+    public ResponseEntity<ApiError> handleEmptyFile(
+            EmptyFileException ex) {
 
-                return ResponseEntity
-                                .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                                .body(
-                                                new ApiError(
-                                                                ex.getMessage(),
-                                                                HttpStatus.BAD_REQUEST.value(),
-                                                                LocalDateTime.now()));
-        }
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(new ApiError(
+                        ex.getMessage(),
+                        HttpStatus.BAD_REQUEST.value(),
+                        LocalDateTime.now()));
+    }
 
-        // @ExceptionHandler(RuntimeException.class)
-        // public ResponseEntity<ApiError> handleRuntimeException(
-        //                 RuntimeException ex) {
+    @ExceptionHandler(SlotNotFoundException.class)
+    public ResponseEntity<ApiError> handleSlotNotFound(
+            SlotNotFoundException ex) {
 
-        //         return ResponseEntity
-        //                         .status(HttpStatus.BAD_REQUEST)
-        //                         .body(
-        //                                         new ApiError(
-        //                                                         ex.getMessage(),
-        //                                                         HttpStatus.BAD_REQUEST.value(),
-        //                                                         LocalDateTime.now()));
-        // }
+        return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body(new ApiError(
+                        ex.getMessage(),
+                        HttpStatus.NOT_FOUND.value(),
+                        LocalDateTime.now()));
+    }
 
-       
+    @ExceptionHandler(SlotUnavailableException.class)
+    public ResponseEntity<ApiError> handleSlotUnavailable(
+            SlotUnavailableException ex) {
 
-        @ExceptionHandler(EmptyResultDataAccessException.class) 
-        public ResponseEntity<ApiError> handleERDException(
-                        EmptyResultDataAccessException ex) {
+        return ResponseEntity
+                .status(HttpStatus.CONFLICT)
+                .body(new ApiError(
+                        ex.getMessage(),
+                        HttpStatus.CONFLICT.value(),
+                        LocalDateTime.now()));
+    }
 
-                return ResponseEntity
-                                .status(HttpStatus.BAD_REQUEST)
-                                .body(
-                                                new ApiError(
-                                                                ex.getMessage(),
-                                                                HttpStatus.BAD_REQUEST.value(),
-                                                                LocalDateTime.now()));
-        }
+    @ExceptionHandler(InvalidSlotException.class)
+    public ResponseEntity<ApiError> handleInvalidSlot(
+            InvalidSlotException ex) {
 
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(new ApiError(
+                        ex.getMessage(),
+                        HttpStatus.BAD_REQUEST.value(),
+                        LocalDateTime.now()));
+    }
 
+    @ExceptionHandler(EmptyResultDataAccessException.class)
+    public ResponseEntity<ApiError> handleEmptyResultDataAccess(
+            EmptyResultDataAccessException ex) {
 
-
-        // @ExceptionHandler(Exception.class)
-        // public ResponseEntity<ApiError> handleException(
-        //                 Exception ex) {
-
-        //         return ResponseEntity
-        //                         .status(HttpStatus.INTERNAL_SERVER_ERROR)
-        //                         .body(
-        //                                         new ApiError(
-        //                                                         "Something went wrong",
-        //                                                         HttpStatus.INTERNAL_SERVER_ERROR.value(),
-        //                                                         LocalDateTime.now()));
-        // }
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(new ApiError(
+                        ex.getMessage(),
+                        HttpStatus.BAD_REQUEST.value(),
+                        LocalDateTime.now()));
+    }
 }

@@ -77,7 +77,14 @@ public class AuthService {
     }
 
     public LoggedinDTO login(LoginDTO dto) {
-        User myUser = userRepository.findByEmail(dto.email()).orElseThrow();
+    
+        User myUser = 
+        findByEmail(dto.email())
+        .orElseThrow(
+                () -> new IncorrectCredentialsException(
+                        "Invalid email or password"
+                )
+        );
 
         if (myUser.getAuthenticationSource().equals(AuthenticationSource.GOOGLE)) {
             throw new OAuthException("Login Using Google !!");

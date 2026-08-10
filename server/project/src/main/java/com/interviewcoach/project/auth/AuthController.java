@@ -9,6 +9,7 @@ import com.interviewcoach.project.auth.dto.LoginDTO;
 import com.interviewcoach.project.auth.dto.RegisterDTO;
 import com.interviewcoach.project.auth.dto.RegisteredDTO;
 import com.interviewcoach.project.auth.dto.RoleSetupDTO;
+import com.interviewcoach.project.auth.exceptions.InvalidRefreshTokenException;
 
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
@@ -56,7 +57,7 @@ public class AuthController {
     public ResponseEntity<LoggedinResponse> refreshToken(
             @CookieValue(name = "refreshToken", required = false) String refreshToken) {
         if (refreshToken == null) {
-            throw new RuntimeException("Invalid RefreeshGToken");
+            throw new InvalidRefreshTokenException("Check your token ! Nothing found");
         }
         LoggedinDTO response = authService.reIssueToken(refreshToken);
         return new ResponseEntity<>(new LoggedinResponse(response.bearerToken()), HttpStatus.OK);
@@ -66,9 +67,9 @@ public class AuthController {
     public ResponseEntity<String> logout(@CookieValue(name = "refreshToken") String refreshToken,
             HttpServletResponse response) {
 
-        System.out.println("Refresh token " + refreshToken) ; 
+   
         if (refreshToken == null) {
-            throw new RuntimeException("Invalid Refresh Token");
+            throw new InvalidRefreshTokenException("Check your token ! Nothing found");
         }
 
         authService.logOut(refreshToken);
